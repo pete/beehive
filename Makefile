@@ -6,30 +6,30 @@ PACKAGE_VERSION = 0.1
 all: compile
 
 compile: deps
-	@./rebar compile
+	./rebar compile
 
 deps:
-	@./rebar get-deps
+	./rebar get-deps
 
 check:
 	@echo "Dependencies"
-	@./rebar check-deps
+	./rebar check-deps
 
 clean:
-	@./rebar clean
-	@rm -rf ./rel/files/etc
+	./rebar clean
+	rm -rf ./rel/files/etc
 
 rel: all
-	@(cp -Rf ./etc ./rel/files/etc)
-	@(make rel_erlang)
-	@(chmod u+x ./rel/beehive/bin/beehive)
-	@(make rel_message)
+	(cp -Rf ./etc ./rel/files/etc)
+	(make rel_erlang)
+	(chmod u+x ./rel/beehive/bin/beehive)
+	(make rel_message)
 
 rel_erlang:
-	@./rebar generate force=1
+	./rebar generate force=1
 
 rel_message:
-	@echo "\
+	echo "\
 Beehive code generated in `pwd`/rel/beehive\n\
 *----------------------------------------------------------*\n\
 * IMPORTANT                                                *\n\
@@ -47,20 +47,20 @@ where to find scripts to trigger app actions.\n\
 
 GITOLITE_REPOS_DIR=~/repositories
 gitolite_setup:
-	@git clone $(GITOLITE_REPOS_DIR)/gitolite_admin rel/beehive/gitolite
-	@cp priv/git/templates/post-receive ~/.gitolite/hooks/post-receive
+	git clone $(GITOLITE_REPOS_DIR)/gitolite_admin rel/beehive/gitolite
+	cp priv/git/templates/post-receive ~/.gitolite/hooks/post-receive
 
 doc:
-	@./rebar doc skip_deps=true
+	./rebar doc skip_deps=true
 
 package:
-	@(mkdir -p ./builds)
-	@(tar -C rel -c beehive | gzip > ./builds/${PACKAGE_NAME}-${PACKAGE_VERSION}.tar.gz)
+	(mkdir -p ./builds)
+	(tar -C rel -c beehive | gzip > ./builds/${PACKAGE_NAME}-${PACKAGE_VERSION}.tar.gz)
 
 test: compile
-	@./test/bootstrap.sh
+	./test/bootstrap.sh
     ifdef suite
-	@./rebar skip_deps=true eunit suite=$(suite)
+	./rebar skip_deps=true eunit suite=$(suite)
     else
-	@./rebar skip_deps=true eunit
+	./rebar skip_deps=true eunit
     endif
