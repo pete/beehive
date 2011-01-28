@@ -429,7 +429,7 @@ handle_info({app_launcher_fsm, error, {StateName, Code}, Props}, State) ->
   {noreply, State};
 
 handle_info({error, AState, Error}, State) ->
-  ?LOG(debug, "something died: ~p", [Error]),
+  ?LOG(debug, "something died: ~p (~p)", [Error, AState]),
   {noreply, State};
 
 handle_info({answer, TransId, Result}, #state{queries = Queries} = State) ->
