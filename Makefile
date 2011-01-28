@@ -29,7 +29,7 @@ rel_erlang:
 	./rebar generate force=1
 
 rel_message:
-	echo "\
+	@echo -e "\
 Beehive code generated in `pwd`/rel/beehive\n\
 *----------------------------------------------------------*\n\
 * IMPORTANT                                                *\n\
@@ -59,8 +59,8 @@ package:
 
 test: compile
 	./test/bootstrap.sh
-    ifdef suite
+ifdef suite
 	./rebar skip_deps=true eunit suite=$(suite)
-    else
+else
 	./rebar skip_deps=true eunit
-    endif
+endif
