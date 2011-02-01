@@ -2,8 +2,8 @@
 -compile(export_all).
 
 epoch() ->
-  now_to_seconds(now()).   
-    
+  now_to_seconds(now()).
+
 time_right_now() ->
   {MSec, Sec, _} = now(),
   MSec * 1000000 + Sec.
@@ -14,8 +14,8 @@ calc_elapsed({MSecStart, SecStart, MicroSecStart}, {MSecFinish, SecFinish, Micro
   (MSecStart * 1000000 + SecStart + MicroSecStart / 1000000).
 
 epoch_hires() ->
-  now_to_seconds_hires(now()).   
-    
+  now_to_seconds_hires(now()).
+
 now_to_seconds({Mega, Sec, _}) -> (Mega * 1000000) + Sec.
 
 seconds_to_timestamp(Seconds) ->
@@ -28,19 +28,19 @@ time_difference_from_now(TimeInSeconds) -> now_to_seconds() - TimeInSeconds.
 
 now_to_milliseconds({Mega, Sec, Micro}) ->
     now_to_seconds({Mega, Sec, Micro}) * 1000.
-    
+
 now_to_seconds_hires({Mega, Sec, Micro}) ->
     now_to_seconds({Mega, Sec, Micro}) + (Micro / 1000000).
-    
+
 now_to_milliseconds_hires({Mega, Sec, Micro}) ->
     now_to_seconds_hires({Mega, Sec, Micro}) * 1000.
-    
+
 epoch_gregorian_seconds() ->
     calendar:datetime_to_gregorian_seconds({{1970,1,1}, {0,0,0}}).
-        
+
 now_to_gregorian_seconds() ->
     epoch_to_gregorian_seconds(now()).
-        
+
 epoch_to_gregorian_seconds({Mega, Sec, Micro}) ->
     epoch_to_gregorian_seconds(now_to_seconds({Mega, Sec, Micro}));
 epoch_to_gregorian_seconds(Now) ->
@@ -103,7 +103,7 @@ subtract(Date, {days, N}) ->
 
 add(Date, {days, N}) ->
     New = calendar:date_to_gregorian_days(Date) + N, calendar:gregorian_days_to_date(New).
-    
+
 pad_zero(L) when length(L) == 1 -> "0" ++ L;
 pad_zero(L) -> L.
 
@@ -111,7 +111,7 @@ fmt_date(TimeStamp) ->
   {{Y, M, D}, {Hr, Min, Sec}} = try
     seconds_to_timestamp(TimeStamp)
   catch
-    error:_Why -> 
+    error:_Why ->
       calendar:now_to_datetime(now())
   end,
   MinStr = pad_zero(lists:flatten(io_lib:format("~w", [Min]))),
