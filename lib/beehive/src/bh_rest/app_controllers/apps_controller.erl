@@ -63,7 +63,7 @@ post([], Data) ->
       end
   end;
 
-  % Not sure about this... yet as far as authentication goes
+% Not sure about this... yet as far as authentication goes
 post([Name, "restart"], _Data) ->
   case apps:restart_by_name(Name) of
     {ok, _} -> {"app", <<"restarting">>};
