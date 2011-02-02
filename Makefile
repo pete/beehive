@@ -9,13 +9,15 @@ compile: deps
 	@./rebar compile
 
 deps:
+	@echo "Getting Dependencies"
 	@./rebar get-deps
 
 check:
-	@echo "Dependencies"
+	@echo "Checking Dependencies"
 	@./rebar check-deps
 
 clean:
+	@echo "Cleaning Built Files"
 	@./rebar clean
 	@rm -rf ./rel/files/etc
 
@@ -51,13 +53,16 @@ gitolite_setup:
 	@cp priv/git/templates/post-receive ~/.gitolite/hooks/post-receive
 
 doc:
+	@echo "Generating Documentation"
 	@./rebar doc skip_deps=true
 
 package:
+	@echo "Making Package"
 	@(mkdir -p ./builds)
 	@(tar -C rel -c beehive | gzip > ./builds/${PACKAGE_NAME}-${PACKAGE_VERSION}.tar.gz)
 
-test: compile
+test:	@echo "Running Test" 
+	compile
 	@./test/bootstrap.sh
     ifdef suite
 	@./rebar skip_deps=true eunit suite=$(suite)
