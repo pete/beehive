@@ -52,8 +52,10 @@ start_link(Args) ->
 init(_Args) ->
  
   ChildrenSpecSet = lists:flatten([
-    ?CHILD(tcp_socket_server_sup, worker),
-    ?CHILD(bh_node_stats_srv, worker),
+%    ?CHILD(tcp_socket_server_sup, worker),
+%    ?CHILD(bh_node_stats_srv, worker),
+    tcp_socket_server_sup(),
+    node_stat_server(),
     optional_dashboard()
   ]),
 
@@ -71,6 +73,12 @@ optional_dashboard()->
   Dashboard = get_worker_spec(beehive_dashboard_sup),
   ShouldRunDashboard = should_run_dashboard(),
   ?IF(ShouldRunDashboard, Dashboard, []).
+
+tcp_socket_server_sup()->
+  get_worker_spec(tcp_socket_server_sup).
+
+node_stat_server()->
+  get_worker_spec(bh_node_stats_srv).
 
 get_worker_spec(Name) when is_atom(Name) ->
   {Name, {Name, start_link, []}, permanent, ?Shutdown_After_TimeoutInSec, worker, [Name]}.
