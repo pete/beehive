@@ -11,7 +11,8 @@
       proxy_handler,
       beehive_request,
       bee_store,
-      tcp_socket_server, tcp_socket_server_sup
+      tcp_socket_server, tcp_socket_server_sup,
+      bh_router_controller_srv, bh_router_controller_sup
     ]},
   {registered,   []},
   {applications, [kernel, stdlib]},
