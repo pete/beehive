@@ -30,25 +30,13 @@ start_client(Args) ->
   supervisor:start_child(the_proxy_srv, [Args]).
 
 init([]) ->
-  ReqSrv    = {the_tcp_socket_server,
-               {tcp_socket_server, start_link, []},
-               permanent,
-               2000,
-               worker,
-               [tcp_socket_server]},
-  ProxySrv  = {the_proxy_srv,
-               {supervisor,start_link,[{local, the_proxy_srv},
-                                       ?MODULE, [proxy_handler]]},
-               permanent,
-               infinity,
-               supervisor,
-               []},
-
-  {ok, {{one_for_one, 5, 10}, [ReqSrv, ProxySrv]}};
+  ReqSrv    = tcp_socket_server(),
+  ProxySrv  = proxy_server(),  
+  {ok, {worker_restart_strategy('one_for_one'), [ReqSrv, ProxySrv]}};
 
 init([Module]) ->
   ProxySrv = {undefined,{Module,start_link,[]},temporary,2000,worker,[]},
-  {ok, {{simple_one_for_one, 5, 10}, [ProxySrv]}}.
+  {ok, {worker_restart_strategy('simple_one_for_one'), [ProxySrv]}}.
 
 stop(_Args) ->
   ok.
@@ -58,3 +46,20 @@ stop(_Args) ->
 worker_restart_strategy(RestartType) when ?is_simple(RestartType), ?is_one_for_one(RestartType)->
   {RestartType, ?MaxRestartTrial, ?MaxTimeBetweenRestartInSec};
 worker_restart_strategy(UnknownRestartType) -> exit ({unsupported_restart_type, UnknownRestartType}).
+
+tcp_socket_server()->
+  {the_tcp_socket_server,
+               {tcp_socket_server, start_link, []},
+               permanent,
+               2000,
+               worker,
+               [tcp_socket_server]}.
+
+proxy_server()->
+  {the_proxy_srv,
+               {supervisor,start_link,[{local, the_proxy_srv},
+                                       ?MODULE, [proxy_handler]]},
+               permanent,
+               infinity,
+               supervisor,
+               []}.
