@@ -61,8 +61,8 @@ package:
 	@(mkdir -p ./builds)
 	@(tar -C rel -c beehive | gzip > ./builds/${PACKAGE_NAME}-${PACKAGE_VERSION}.tar.gz)
 
-test:	@echo "Running Test" 
-	compile
+test:	compile
+	@echo "Running Test" 
 	@./test/bootstrap.sh
     ifdef suite
 	@./rebar skip_deps=true eunit suite=$(suite)

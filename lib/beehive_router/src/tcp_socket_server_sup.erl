@@ -17,6 +17,12 @@
   stop/1
 ]).
 
+-define (MaxRestartTrial, 5).
+-define (MaxTimeBetweenRestartInSec, 10).
+-define (TcpTimeoutInSec, 2000).
+-define(is_simple(Strategy), Strategy =:= simple_one_for_one).
+-define(is_one_for_one(Strategy), Strategy =:= one_for_one).
+
 start_link() ->
   supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
@@ -46,3 +52,9 @@ init([Module]) ->
 
 stop(_Args) ->
   ok.
+%%--------------------------------------------------------------------
+%%% Internal functions
+%%--------------------------------------------------------------------
+worker_restart_strategy(RestartType) when ?is_simple(RestartType), ?is_one_for_one(RestartType)->
+  {RestartType, ?MaxRestartTrial, ?MaxTimeBetweenRestartInSec};
+worker_restart_strategy(UnknownRestartType) -> exit ({unsupported_restart_type, UnknownRestartType}).
