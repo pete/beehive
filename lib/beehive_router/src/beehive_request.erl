@@ -5,6 +5,7 @@
   new/1
 ]).
 
+-define (MAX_HEADERS, 100).
 
 % Create a new beehive request object from a socket
 new(ClientSock) ->
