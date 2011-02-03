@@ -197,21 +197,18 @@ terminate1(Reason, #state{server_socket = SSock, client_socket = CSock,
 handle_streaming_data(client, From,
                       #state{client_socket = CSock,
                              timeout = Timeout} = State) ->
-  try_receive_socket(From, client, CSock, ?no_data_fragmentation, Timeout, State);
+  try_receive_socket(From, CSock, Timeout, State);
 
 handle_streaming_data(server, From,
                       #state{server_socket = SSock,
                              timeout = Timeout} = State) ->
-  try_receive_socket(From, server, SSock, ?no_data_fragmentation, Timeout, State).
+  try_receive_socket(From, SSock, Timeout, State).
 
-%TODO: will the following mess up tail opt?????
-try_receive_socket(From, Type, Socket, BlockSizeBytes, Timeout, State) when  
-                                                    is_integer(BlockSizeBytes), 
-                                                    is_integer(Timeout) ->
-  case gen_tcp:recv(Socket, BlockSizeBytes, Timeout) of
+try_receive_socket(From, Socket, Timeout, State) when is_integer(Timeout) ->
+  case gen_tcp:recv(Socket, ?no_data_fragmentation, Timeout) of
     {ok, D} ->
       From ! {tcp, Socket, D},
-      handle_streaming_data(Type, From, State);
+      try_receive_socket(From, Socket, Timeout, State);
     {error, _Error} ->
       From ! {tcp_closed, self(), Socket}
   end. 
