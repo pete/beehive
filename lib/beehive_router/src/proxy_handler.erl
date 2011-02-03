@@ -18,6 +18,7 @@
 ]).
 
 -export ([terminate1/2]).
+-define (no_data_fragmentation, 0).
 
 -record(state, {
   routing_key,          % subdomain of the app to look for
@@ -196,17 +197,15 @@ terminate1(Reason, #state{server_socket = SSock, client_socket = CSock,
 handle_streaming_data(client, From,
                       #state{client_socket = CSock,
                              timeout = Timeout} = State) ->
-  GetAllBytes = 0,
-  try_receive_socket(client, CSock, GetAllBytes, Timeout, From, State);
+  try_receive_socket(From, client, CSock, ?no_data_fragmentation, Timeout, State);
 
 handle_streaming_data(server, From,
                       #state{server_socket = SSock,
                              timeout = Timeout} = State) ->
-  GetAllBytes = 0,
-  try_receive_socket(server, SSock, GetAllBytes, Timeout, From, State).
+  try_receive_socket(From, server, SSock, ?no_data_fragmentation, Timeout, State).
 
 %TODO: will the following mess up tail opt?????
-try_receive_socket(Type, Socket, BlockSizeBytes, Timeout, From, State) when  
+try_receive_socket(From, Type, Socket, BlockSizeBytes, Timeout, State) when  
                                                     is_integer(BlockSizeBytes), 
                                                     is_integer(Timeout) ->
   case gen_tcp:recv(Socket, BlockSizeBytes, Timeout) of
@@ -216,3 +215,4 @@ try_receive_socket(Type, Socket, BlockSizeBytes, Timeout, From, State) when
     {error, _Error} ->
       From ! {tcp_closed, self(), Socket}
   end. 
+
