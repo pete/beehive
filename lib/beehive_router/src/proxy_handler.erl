@@ -196,20 +196,23 @@ terminate1(Reason, #state{server_socket = SSock, client_socket = CSock,
 handle_streaming_data(client, From,
                       #state{client_socket = CSock,
                              timeout = Timeout} = State) ->
-  case gen_tcp:recv(CSock, 0, Timeout) of
-    {ok, D} ->
-      From ! {tcp, CSock, D},
-      handle_streaming_data(client, From, State);
-    {error, _Error} ->
-      From ! {tcp_closed, self(), CSock}
-  end;
+  GetAllBytes = 0,
+  try_receive_socket(client, CSock, GetAllBytes, Timeout, From, State);
+
 handle_streaming_data(server, From,
                       #state{server_socket = SSock,
                              timeout = Timeout} = State) ->
-  case gen_tcp:recv(SSock, 0, Timeout) of
+  GetAllBytes = 0,
+  try_receive_socket(server, SSock, GetAllBytes, Timeout, From, State).
+
+%TODO: will the following mess up tail opt?????
+try_receive_socket(Type, Socket, BlockSizeBytes, Timeout, From, State) when  
+                                                    is_integer(BlockSizeBytes), 
+                                                    is_integer(Timeout) ->
+  case gen_tcp:recv(Socket, BlockSizeBytes, Timeout) of
     {ok, D} ->
-      From ! {tcp, SSock, D},
-      handle_streaming_data(server, From, State);
+      From ! {tcp, Socket, D},
+      handle_streaming_data(Type, From, State);
     {error, _Error} ->
-      From ! {tcp_closed, self(), SSock}
-  end.
+      From ! {tcp_closed, self(), Socket}
+  end. 
