@@ -12,7 +12,8 @@
       beehive_request,
       bee_store,
       tcp_socket_server, tcp_socket_server_sup,
-      bh_router_controller_srv, bh_router_controller_sup
+      bh_router_controller_srv, bh_router_controller_sup,
+      beehive_router_config
     ]},
   {registered,   []},
   {applications, [kernel, stdlib]},
