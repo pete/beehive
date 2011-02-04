@@ -7,7 +7,7 @@ def grab_code_root(filename)
     puts "found config in #{filename}"
     $1.strip
   else
-    err
+    nil
   end
 end
 
