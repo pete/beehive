@@ -35,19 +35,20 @@
 % Yes, the id is redundant, optimization of this might
 % be ideal... i.e. remove the host/port/app_name fields
 -record (bee, {
-  id,                       % tuple id of the app_name, host and port {app_name, host, port}
-  app_name,                 % name of the app this bee supports
+  id,         % tuple id of the app_name, host and port {app_name, host, port}
+  app_name,   % name of the app this bee supports
   host,
   host_node,
   port,
-  bee_file,                 % path of app on hostnode
+  bee_file,   % path of app on hostnode
   revision,
-  template,                 % type of app (rails, rack, java, etc.)
+  template,   % type of app (rails, rack, java, etc.)
   bee_size,
   start_time    = 0,        % starting time
-  pid,                      % pid of the port process tracker
-  os_pid,                   % pid of the os port process
-  sticky        = false,    % keep this bee around, don't remove it from the bee list if it dies
+  pid,        % pid of the port process tracker
+  os_pid,     % pid of the os port process
+  % Keep this bee around, don't remove it from the bee list if it dies:
+  sticky        = false,
   lastresp_time = 0,
   lasterr       = 0,
   lasterr_time  = 0,
