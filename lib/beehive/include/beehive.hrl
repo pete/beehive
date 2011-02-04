@@ -80,10 +80,12 @@
 % Application configuration
 -record (app, {
   name,
-  dynamic       = dynamic,          % dynamic | static (if this is set to static, we cannot launch a new one)
+  % dynamic | static (if this is set to static, we cannot launch a new one):
+  dynamic       = dynamic,
   routing_param = 'Host',
   timeout,
-  sticky        = false,            % if an app is sticky, the apps are not requested after timeout time
+  % if an app is sticky, the apps are not requested after timeout time:
+  sticky        = false,
   min_instances = 0,
   max_instances = 1,
   branch = "master",                % The branch of the app to check out
@@ -123,13 +125,13 @@
 
 %% Overall proxy_state of the proxy
 -record(proxy_state, {
-  local_port,				          % Local TCP port number
-  local_host,                 % Local host ip tuple or name
-  conn_timeout = (1*1000),		% Connection timeout (ms)
-  act_timeout = (120*1000),		% Activity timeout (ms)
-  acceptor,				            % Pid of listener proc
-  start_time  = 0,            % Proxy start timestamp
-  to_timer				            % Timeout timer ref
+  local_port,               % Local TCP port number
+  local_host,               % Local host ip tuple or name
+  conn_timeout = (1*1000),  % Connection timeout (ms)
+  act_timeout = (120*1000), % Activity timeout (ms)
+  acceptor,                 % Pid of listener proc
+  start_time  = 0,          % Proxy start timestamp
+  to_timer                  % Timeout timer ref
 }).
 
 % Stats for a bee
