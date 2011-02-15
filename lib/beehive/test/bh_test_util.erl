@@ -34,7 +34,8 @@ setup(Proplist) when is_list(Proplist) ->
       GlitterConfig = filename:join([Dir, "test", "gitolite-admin",
                                      "conf", "gitolite.conf"]),
       application:set_env(glitter, config_file, GlitterConfig),
-      application:start(sasl),
+      %application:start(sasl),
+      ensure_app_start(sasl),
       %% We don't need any error output here.
       beehive:start([{beehive_db_srv, testing}]),
 
@@ -42,11 +43,35 @@ setup(Proplist) when is_list(Proplist) ->
     {ok, _} -> ok
   end;
 
-
 setup(Table) ->
   setup(),
   clear_table(Table),
   ok.
+
+ensure_app_start(App) when is_atom(App) ->
+  case application:start(App) of
+  	ok -> ok;
+  	{error, {already_started, _}} -> ok;
+        {error, ERROR } -> {error, ERROR}
+  end.
+
+ensure_rest_server()->
+  case rest_server:start_link() of
+       ok -> ok;
+       {already_started, _PID} -> ok;
+       {error, {already_started, _PID}} -> ok;
+       {error, ERROR} -> {error, ERROR}
+  end.
+  
+ensure_rest_server_stop()->
+  case rest_server:stop() of
+      ok -> ok;
+      {already_stopped, _ELSE} -> ok;
+      {error, {already_stopped, _PID}}-> ok;
+      {error , ERROR} -> {error, ERROR}
+  end.
+  
+
 
 try_to_fetch_url_or_retry(_Method, _Args, 0) -> failed;
 try_to_fetch_url_or_retry(Method, Args, Times) ->

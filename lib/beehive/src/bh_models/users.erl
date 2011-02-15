@@ -31,6 +31,7 @@
 
 find_by_email(Hostemail) ->
   case find_all_by_email(Hostemail) of
+    [] -> not_found;
     [B|_] -> B;
     _ -> not_found
   end.

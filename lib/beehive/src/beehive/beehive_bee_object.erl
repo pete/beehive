@@ -845,10 +845,26 @@ unique_filename(#bee_object{name = Name} = _BeeObject) ->
 
 %% Get temp_file
 temp_file() ->
-  Filename = test_server:temp_name(atom_to_list(?MODULE)),
+  %Filename = test_server:temp_name(atom_to_list(?MODULE)),
+  Filename = generate_unique_name(?MODULE),
   Filepath = filename:join(["/tmp", Filename]),
   {ok, Io} = file:open(Filepath, [write]),
   {ok, Filepath, Io}.
+  
+generate_unique_name(Stem)->
+  {A,B,C} = erlang:now(), %Assuming that this will get a large enough number
+  LowerRange = 0,
+  UpperRange = A bxor B bxor C,
+  RandomNum = crypto:rand_uniform(LowerRange, UpperRange),
+  RandomName = atom_to_list(Stem) ++ integer_to_list(RandomNum),
+  {ok,Files} = file:list_dir(filename:dirname(Stem)),
+  case lists:member(RandomName,Files) of
+	true ->
+	    generate_unique_name(Stem); %% collision
+	false ->
+	    RandomName
+ end.
+ 
 
 build_envs(Proplists) ->
   lists:flatten(lists:map(fun build_env/1,
@@ -947,9 +963,9 @@ start_ets_process() ->
   end.
 
 run_kill_on_pid(_OsPid, BeeDir, RealBeeObject) ->
-  %% KillStr = lists:flatten(["kill ", integer_to_list(OsPid)]),
   From = self(),
-  case beehive_bee_object_config:get_or_default(stop, RealBeeObject#bee_object.template) of
+  case beehive_bee_object_config:
+    get_or_default(stop, RealBeeObject#bee_object.template) of
     {error, _} = T ->
       send_to(From, T),
       throw(T);
@@ -963,19 +979,6 @@ run_kill_on_pid(_OsPid, BeeDir, RealBeeObject) ->
           run_hook_action(post, RealBeeObject, From)
       end
   end.
-
-%% ?DEBUG_PRINT({killing_with_string, KillStr}),
-%% cmd(KillStr, BeeDir, to_proplist(RealBeeObject), self()),
-%% receive
-%%   {error, _} = Tuple ->
-%%     erlang:display({run_kill_on_pid,error,KillStr,Tuple}),
-%%     Tuple;
-%%   X ->
-%%     erlang:display({run_kill_on_pid,KillStr,X}),
-%%     ok
-%%   after 5000 ->
-%%     ok
-%% end.
 
 log_shell_output(Tuple, Name) ->
   case Tuple of

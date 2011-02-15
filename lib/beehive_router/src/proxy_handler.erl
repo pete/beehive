@@ -18,6 +18,7 @@
 ]).
 
 -export ([terminate1/2]).
+-define (no_data_fragmentation, 0).
 
 -record(state, {
   routing_key,          % subdomain of the app to look for
@@ -196,20 +197,19 @@ terminate1(Reason, #state{server_socket = SSock, client_socket = CSock,
 handle_streaming_data(client, From,
                       #state{client_socket = CSock,
                              timeout = Timeout} = State) ->
-  case gen_tcp:recv(CSock, 0, Timeout) of
-    {ok, D} ->
-      From ! {tcp, CSock, D},
-      handle_streaming_data(client, From, State);
-    {error, _Error} ->
-      From ! {tcp_closed, self(), CSock}
-  end;
+  try_receive_socket(From, CSock, Timeout, State);
+
 handle_streaming_data(server, From,
                       #state{server_socket = SSock,
                              timeout = Timeout} = State) ->
-  case gen_tcp:recv(SSock, 0, Timeout) of
+  try_receive_socket(From, SSock, Timeout, State).
+
+try_receive_socket(From, Socket, Timeout, State) when is_integer(Timeout) ->
+  case gen_tcp:recv(Socket, ?no_data_fragmentation, Timeout) of
     {ok, D} ->
-      From ! {tcp, SSock, D},
-      handle_streaming_data(server, From, State);
+      From ! {tcp, Socket, D},
+      try_receive_socket(From, Socket, Timeout, State);
     {error, _Error} ->
-      From ! {tcp_closed, self(), SSock}
-  end.
+      From ! {tcp_closed, self(), Socket}
+  end. 
+

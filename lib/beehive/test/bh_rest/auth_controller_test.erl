@@ -2,12 +2,15 @@
 -include_lib("eunit/include/eunit.hrl").
 
 setup() ->
+  bh_test_util:setup(),
   bh_test_util:dummy_user(),
-  rest_server:start_link(),
+  bh_test_util:ensure_rest_server(),
+  %rest_server:start_link(),
   timer:sleep(100),
   ok.
 
 teardown(_X) ->
+  bh_test_util:ensure_rest_server_stop(),
   ok.
 
 starting_test_() ->

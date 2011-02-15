@@ -33,6 +33,7 @@
 
 find_by_email(Email) ->
   case find_all_by_email(Email) of
+    [] -> not_found;
     [B|_] -> B;
     _ -> not_found
   end.
