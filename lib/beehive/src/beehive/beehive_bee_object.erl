@@ -845,10 +845,26 @@ unique_filename(#bee_object{name = Name} = _BeeObject) ->
 
 %% Get temp_file
 temp_file() ->
-  Filename = test_server:temp_name(atom_to_list(?MODULE)),
+  %Filename = test_server:temp_name(atom_to_list(?MODULE)),
+  Filename = generate_unique_name(?MODULE),
   Filepath = filename:join(["/tmp", Filename]),
   {ok, Io} = file:open(Filepath, [write]),
   {ok, Filepath, Io}.
+  
+generate_unique_name(Stem)->
+  {A,B,C} = erlang:now(), %Assuming that this will get a large enough number
+  LowerRange = 0,
+  UpperRange = A bxor B bxor C,
+  RandomNum = crypto:rand_uniform(LowerRange, UpperRange),
+  RandomName = atom_to_list(Stem) ++ integer_to_list(RandomNum),
+  {ok,Files} = file:list_dir(filename:dirname(Stem)),
+  case lists:member(RandomName,Files) of
+	true ->
+	    generate_unique_name(Stem); %% collision
+	false ->
+	    RandomName
+ end.
+ 
 
 build_envs(Proplists) ->
   lists:flatten(lists:map(fun build_env/1,
