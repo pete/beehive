@@ -78,7 +78,7 @@ exist(Name) ->
   end.
 
 find_by_name(Name) ->
-  case find_all_by_name(Name) of\
+  case find_all_by_name(Name) of
     [] -> not_found;
     [H|_Rest] -> H;
     %% This should ALWAYS be not_found, but just to be safe
