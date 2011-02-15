@@ -219,17 +219,21 @@ handle_vote(_Msg, State) ->
 %%--------------------------------------------------------------------
 fetch_bee(#app{name = Name} = _App, Caller, _State) ->
   case lists:filter(fun(Pid) ->
-                        rpc:call(node(Pid), ?MODULE, has_bee_named, [Name])
-                    end, seed_pids({})) of
+          rpc:call(node(Pid), ?MODULE, has_bee_named, [Name])
+      end, seed_pids({})) of
     [] ->
-      ?LOG(debug, "lists:filter on seed_pids([]) [~p] returned []", [seed_pids({})]),
+      ?LOG(debug, "lists:filter on seed_pids([]) [~p] returned []",
+        [seed_pids({})]),
       {error, does_not_exist};
     [H|_ServerPids] ->
       % For now we won't verify the receipt of the bee
       % we'll assume that it will be sent across the wire for simplicity
       % TODO: Add error checking to fetch_bee
-      O = rpc:call(node(H), beehive_bee_object, send_bee_object, [node(Caller), Name, Caller]),
-      ?LOG(debug, "rpc:call(~p, beehive_bee_object, send_bee_object, [~p, ~p, ~p]) returned ~p", [node(H), node(Caller), Name, Caller, O]),
+      O = rpc:call(node(H), beehive_bee_object, send_bee_object,
+        [node(Caller), Name, Caller]),
+      ?LOG(debug, "rpc:call(~p, beehive_bee_object, send_bee_object, " ++
+          "[~p, ~p, ~p]) returned ~p",
+        [node(H), node(Caller), Name, Caller, O]),
       O
   end.
 

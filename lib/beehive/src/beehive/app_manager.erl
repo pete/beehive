@@ -515,7 +515,7 @@ spawn_update_bee_status(Bee, From, Nums) ->
 %% Try to connect to the application instance while it's booting up
 try_to_connect_to_new_instance(_Bee, 0) -> broken;
 try_to_connect_to_new_instance(Bee, Attempts) ->
-  ?LOG(debug, "try_to_connect_to_new_instance (~p:~p) ~p",
+  ?LOG(debug, "try_to_connect_to_new_instance (~p:~p) Attempts left: ~p.",
        [Bee#bee.host, Bee#bee.port, Attempts]),
   case gen_tcp:connect(Bee#bee.host, Bee#bee.port,
                        [binary, {packet, 0}], 500) of
